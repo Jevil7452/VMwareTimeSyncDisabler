@@ -21,9 +21,10 @@ namespace VMwareTimeSyncDisabler
 
         private void button1_Click(object sender, EventArgs e)
         {
-            openFileDialog1.ShowDialog();
-            // Define the lines to be written
-            List<string> newLines = new List<string>()
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                // Define the lines to be written
+                List<string> newLines = new List<string>()
                 {
                     "time.synchronize.continue = \"FALSE\"",
                     "time.synchronize.restore = \"FALSE\"",
@@ -34,41 +35,42 @@ namespace VMwareTimeSyncDisabler
                     "time.synchronize.resume.host = \"FALSE\"",
                 };
 
-            // Read existing lines from the file
-            List<string> existingLines = new List<string>();
-            if (File.Exists(openFileDialog1.FileName))
-            {
-                existingLines = File.ReadAllLines(openFileDialog1.FileName).ToList();
-            }
-
-            // Append new lines that are not already in the file
-            List<string> addedLines = new List<string>();
-            foreach (string line in newLines)
-            {
-                if (!existingLines.Contains(line))
+                // Read existing lines from the file
+                List<string> existingLines = new List<string>();
+                if (File.Exists(openFileDialog1.FileName))
                 {
-                    existingLines.Add(line);
-                    addedLines.Add(line);
+                    existingLines = File.ReadAllLines(openFileDialog1.FileName).ToList();
                 }
-            }
 
-            // Write updated lines to the file
-            using (StreamWriter stream = new StreamWriter(openFileDialog1.FileName))
-            {
-                foreach (string line in existingLines)
+                // Append new lines that are not already in the file
+                List<string> addedLines = new List<string>();
+                foreach (string line in newLines)
                 {
-                    stream.WriteLine(line);
+                    if (!existingLines.Contains(line))
+                    {
+                        existingLines.Add(line);
+                        addedLines.Add(line);
+                    }
                 }
-            }
 
-            // Show message box if lines were added
-            if (addedLines.Count > 0)
-            {
-                MessageBox.Show("Time sync disabled succesfully");
-            }
-            else
-            {
-                MessageBox.Show("Time sync was already disabled for this file");
+                // Write updated lines to the file
+                using (StreamWriter stream = new StreamWriter(openFileDialog1.FileName))
+                {
+                    foreach (string line in existingLines)
+                    {
+                        stream.WriteLine(line);
+                    }
+                }
+
+                // Show message box if lines were added
+                if (addedLines.Count > 0)
+                {
+                    MessageBox.Show("Time sync disabled succesfully");
+                }
+                else
+                {
+                    MessageBox.Show("Time sync was already disabled for this file");
+                }
             }
         }
     }
